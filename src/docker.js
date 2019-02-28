@@ -66,9 +66,10 @@ const isDockerRunning = () => {
  * @return {Array} The array of containers as { name, status }
  */
 const getContainers = () => {
-    const [res, out, err, status] = GLib.spawn_command_line_sync("docker ps -a --format '{{.Names}},{{.Status}}'");
-    if (status !== 0)
+    const [res, out, err, status] = GLib.spawn_command_line_sync("docker ps -a --format '{{.Names}},{{.Status}},{{.Image}},{{.Size}}'");
+    if (status !== 0) {
         throw new Error("Error occurred when fetching containers");
+    }
 
     return String.fromCharCode.apply(String, out).trim().split('\n')
         .filter((string) => string.length > 0)
@@ -76,7 +77,9 @@ const getContainers = () => {
             const values = string.split(',');
             return {
                 name: values[0],
-                status: values[1]
+                status: values[1],
+                image: values[2],
+                size: values[3]
             };
         });
 };
